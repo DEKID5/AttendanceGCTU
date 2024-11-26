@@ -45,14 +45,14 @@ function Homepage({ setView }) {
         <h1 style={{ fontWeight: 'bold' }}>GCTU STUDENT ATTENDANCE SYSTEM</h1>
         {showCreateOptions ? (
           <div className="create-options">
-            <button onClick={() => setView('createStudentAccount')}>Create Student Account</button>
-            <button onClick={() => setView('createAdminAccount')}>Create Admin Account</button>
-            <button onClick={() => setShowCreateOptions(false)}>Back</button> {/* Add a back button to return to main options */}
+            <button onClick={() => setView('createStudentAccount')} className="button">Create Student Account</button>
+            <button onClick={() => setView('createAdminAccount')} className="button">Create Admin Account</button>
+            <button onClick={() => setShowCreateOptions(false)} className="button">Back</button> {/* Add a back button to return to main options */}
           </div>
         ) : (
           <div className="buttons">
-            <button onClick={() => setView('login')}>Login</button>
-            <button onClick={() => setShowCreateOptions(true)}>Create Account</button>
+            <button onClick={() => setView('login')} className="button">Login</button>
+            <button onClick={() => setShowCreateOptions(true)} className="button">Create Account</button>
           </div>
         )}
       </div>

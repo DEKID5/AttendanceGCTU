@@ -14,28 +14,33 @@ function AdminLogin({ onLogin, onResetPassword }) {
   };
 
   return (
-    <div>
-      <h2>Admin Login</h2>
-      <input
-        type="text"
-        placeholder="Admin Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      /><br />
-      <input
-        type="text"
-        placeholder="Staff ID"
-        value={staffID}
-        onChange={(e) => setStaffID(e.target.value)}
-      /><br />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      /><br />
-      <button onClick={handleLogin}>Login</button>
-      <button onClick={onResetPassword}>Reset Password</button> {/* Add Reset Password button */}
+    <div className="container">
+      <div className="form">
+        <h2>Admin Login</h2>
+        <input
+          type="text"
+          placeholder="Admin Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="input-field"
+        /><br />
+        <input
+          type="text"
+          placeholder="Staff ID"
+          value={staffID}
+          onChange={(e) => setStaffID(e.target.value)}
+          className="input-field"
+        /><br />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="input-field"
+        /><br />
+        <button onClick={handleLogin} className="button">Login</button>
+        <button onClick={onResetPassword} className="button">Reset Password</button>
+      </div>
     </div>
   );
 }

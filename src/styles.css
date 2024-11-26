@@ -1,6 +1,6 @@
 body {
-  font-family: Arial, sans-serif;
-  background-color: white; /* Changed background color to white */
+  font-family: 'Serif';
+  background-color: white;
   margin: 0;
   padding: 0;
   display: flex;
@@ -8,27 +8,76 @@ body {
   align-items: center;
 }
 
-.homepage h1 {
-  font-size: 2.5em;
-  color: #000000; /* Set text color to black */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: white;
 }
 
-.buttons, .create-options {
-  margin-top: 20px;
+.form {
+  background-color: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-weight: bold;
 }
 
-button {
-  padding: 10px 20px;
-  margin: 10px;
+h2 {
+  font-size: 2em;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 30px;
   font-size: 1em;
+}
+
+.button {
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0;
+  font-size: 1em;
+  font-weight: bold;
   color: white;
-  background-color: #ED9E59;
+  background-color: #6BA3BE;
   border: none;
-  border-radius: 5px;
+  border-radius: 30px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-button:hover {
-  background-color: #e18e4f;
+.button:hover {
+  background-color: #5b92ab;
+}
+
+.course-card {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.course-card h4 {
+  margin: 0;
+  font-weight: bold;
+}
+
+.course-card p {
+  margin: 10px 0 0;
+}
+
+.qr-scanner {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
 }

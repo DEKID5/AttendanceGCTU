@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import './styles.css'; // Import the CSS file
+import './styles.css';
 import Login from './components/Login';
 import StudentLogin from './components/StudentLogin';
 import AdminLogin from './components/AdminLogin';
@@ -13,10 +13,10 @@ import StudentDashboard from './components/StudentDashboard';
 import PasswordReset from './components/PasswordReset';
 
 function App() {
-  const [view, setView] = useState('homepage'); // 'homepage', 'studentLogin', 'adminLogin', 'createStudentAccount', 'createAdminAccount', 'accountList', 'courseList', 'dashboard', 'studentDashboard', 'passwordReset'
-  const [loggedInUser, setLoggedInUser] = useState(null); // 'student' or 'admin'
-  const [history, setHistory] = useState(['homepage']); // Store navigation history
-  const [historyIndex, setHistoryIndex] = useState(0); // Track the current position in history
+  const [view, setView] = useState('homepage'); // Possible views: 'homepage', 'studentLogin', 'adminLogin', 'createStudentAccount', 'createAdminAccount', 'accountList', 'courseList', 'dashboard', 'studentDashboard', 'passwordReset'
+  const [loggedInUser, setLoggedInUser] = useState(null); // Possible values: 'student' or 'admin'
+  const [history, setHistory] = useState(['homepage']); // Navigation history
+  const [historyIndex, setHistoryIndex] = useState(0); // Current position in history
 
   const navigateTo = useCallback((page) => {
     const newHistory = [...history.slice(0, historyIndex + 1), page];
@@ -78,7 +78,7 @@ function App() {
       {view === 'courseList' && loggedInUser === 'admin' && <CourseList />}
       {view === 'dashboard' && loggedInUser === 'admin' && <Dashboard />}
       {view === 'studentDashboard' && loggedInUser === 'student' && <StudentDashboard />}
-      {view === 'passwordReset' && <PasswordReset onBack={() => navigateTo('login')} />} {/* Add PasswordReset component */}
+      {view === 'passwordReset' && <PasswordReset onBack={() => navigateTo('login')} />}
     </div>
   );
 }

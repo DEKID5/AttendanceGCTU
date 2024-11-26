@@ -1,37 +1,46 @@
 import React, { useState } from 'react';
 
-function StudentLogin() {
+function StudentLogin({ onLogin, onResetPassword }) {
   const [name, setName] = useState('');
   const [studentID, setStudentID] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    // Add your login logic here
-    alert(`Student Name: ${name}, Student ID: ${studentID}`);
+    if (name && studentID && password) {
+      onLogin(studentID);
+    } else {
+      alert('Please fill in all fields');
+    }
   };
 
   return (
-    <div>
-      <h2>Student Login</h2>
-      <input
-        type="text"
-        placeholder="Student Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      /><br />
-      <input
-        type="text"
-        placeholder="Student ID"
-        value={studentID}
-        onChange={(e) => setStudentID(e.target.value)}
-      /><br />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      /><br />
-      <button onClick={handleLogin}>Login</button>
+    <div className="login-container">
+      <div className="login-form">
+        <h2>Student Login</h2>
+        <input
+          type="text"
+          placeholder="Student Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="input-field"
+        /><br />
+        <input
+          type="text"
+          placeholder="Student ID"
+          value={studentID}
+          onChange={(e) => setStudentID(e.target.value)}
+          className="input-field"
+        /><br />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="input-field"
+        /><br />
+        <button onClick={handleLogin} className="login-button">Login</button>
+        <button onClick={onResetPassword} className="reset-button">Reset Password</button>
+      </div>
     </div>
   );
 }

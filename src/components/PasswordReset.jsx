@@ -13,16 +13,19 @@ function PasswordReset({ onBack }) {
   };
 
   return (
-    <div>
-      <h2>Password Reset</h2>
-      <input
-        type="email"
-        placeholder="Enter your email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      /><br />
-      <button onClick={handleReset}>Send Reset Link</button>
-      <button onClick={onBack}>Back</button>
+    <div className="container">
+      <div className="form">
+        <h2>Password Reset</h2>
+        <input
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="input-field"
+        /><br />
+        <button onClick={handleReset} className="button">Send Reset Link</button>
+        <button onClick={onBack} className="button">Back</button>
+      </div>
     </div>
   );
 }
