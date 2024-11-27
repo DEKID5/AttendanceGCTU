@@ -1,6 +1,27 @@
+:root {
+  --background-color: white;
+  --text-color: #000;
+  --primary-color: #37415C;
+  --secondary-color: #F3DADF;
+  --button-hover-color: #d6b4b9;
+  --sidebar-color: #2a2a2a;
+  --menu-hover-color: #575757;
+}
+
+body.dark {
+  --background-color: #121212;
+  --text-color: #ffffff;
+  --primary-color: #1c1c1c;
+  --secondary-color: #333;
+  --button-hover-color: #555;
+  --sidebar-color: #1a1a1a;
+  --menu-hover-color: #444;
+}
+
 body {
+  background-color: var(--background-color);
+  color: var(--text-color);
   font-family: 'Serif';
-  background-color: white;
   margin: 0;
   padding: 0;
   display: flex;
@@ -13,16 +34,16 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: white;
+  background-color: var(--background-color);
 }
 
 .form {
-  background-color: #37415C;
+  background-color: var(--primary-color);
   padding: 40px;
   border-radius: 10px;
   width: 400px;
   margin: 0 auto;
-  color: #F3DADF;
+  color: var(--secondary-color);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
   font-weight: bold;
@@ -32,7 +53,7 @@ h2 {
   font-size: 2em;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #F3DADF;
+  color: var(--secondary-color);
 }
 
 .input-field {
@@ -41,8 +62,8 @@ h2 {
   margin: 10px 0;
   border: none;
   border-radius: 5px;
-  background-color: #F3DADF;
-  color: #37415C;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
 }
 
 .button {
@@ -51,8 +72,8 @@ h2 {
   margin: 10px 0;
   font-size: 1em;
   font-weight: bold;
-  color: #37415C;
-  background-color: #F3DADF;
+  color: var(--primary-color);
+  background-color: var(--secondary-color);
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -60,11 +81,23 @@ h2 {
 }
 
 .button:hover {
-  background-color: #d6b4b9;
+  background-color: var(--button-hover-color);
+}
+
+.toggle-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 10px 20px;
+  font-size: 1.5em;
+  color: var(--text-color);
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }
 
 .course-card {
-  background-color: #fff;
+  background-color: var(--background-color);
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -144,9 +177,12 @@ h2 {
 
 .sidebar {
   width: 250px;
-  background-color: #2a2a2a;
+  background-color: var(--sidebar-color);
   color: white;
   padding: 20px;
+  border-radius: 10px;
+  margin-right: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .dropdown {
@@ -154,19 +190,20 @@ h2 {
 }
 
 .menu-btn {
-  background-color: #2a2a2a;
+  background-color: var(--sidebar-color);
   color: white;
   border: none;
   padding: 10px 20px;
   cursor: pointer;
   width: 100%;
   text-align: left;
+  font-weight: bold;
 }
 
 .dropdown-menu {
   display: none;
   position: absolute;
-  background-color: #2a2a2a;
+  background-color: var(--sidebar-color);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 1;
   width: 100%;
@@ -180,7 +217,7 @@ h2 {
 }
 
 .dropdown-menu a:hover {
-  background-color: #575757;
+  background-color: var(--menu-hover-color);
 }
 
 .dropdown:hover .dropdown-menu {
@@ -190,11 +227,66 @@ h2 {
 .dashboard-content {
   flex-grow: 1;
   padding: 20px;
-  background-color: #f4f4f4;
+  background-color: var(--background-color);
 }
 
 .grid-container {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 20px;
+}
+
+.error {
+  color: red;
+  font-size: 0.8em;
+  margin-top: 5px;
+}
+
+/* Homepage specific styles */
+.homepage-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100vh;
+  position: relative;
+  color: var(--text-color);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  width: 45%;
+  background: var(--background-color);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.banner {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px;
+}
+
+.social-login {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+}
+
+.social-btn {
+  background: #eee;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
 }

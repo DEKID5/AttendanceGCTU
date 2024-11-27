@@ -1,29 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
-import './Dashboard.css'; // Ensure this CSS file exists
+import { getCourses, addCourse as addCourseToDB } from '../firebaseService'; // Ensure this path is correct based on your project structure
+import '../styles.css'; // Ensure this CSS file exists
 
 function Dashboard({ navigateTo }) {
   const [courses, setCourses] = useState([]);
   const [qrCodes, setQrCodes] = useState({});
   const [newCourse, setNewCourse] = useState('');
   const [newCourseLevel, setNewCourseLevel] = useState(100);
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
 
   useEffect(() => {
-    const storedCourses = JSON.parse(localStorage.getItem('courses')) || [];
-    setCourses(storedCourses);
+    const fetchData = async () => {
+      const courseList = await getCourses();
+      setCourses(courseList);
+    };
+
+    fetchData();
   }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle('dark', isDarkMode);
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
 
   const generateQrCode = (courseName) => {
     const newQrCode = `${courseName}-attendance-${Date.now()}`;
-    localStorage.setItem(`qrCode-${courseName}`, newQrCode);
     setQrCodes(prevQrCodes => ({ ...prevQrCodes, [courseName]: newQrCode }));
   };
 
-  const addCourse = () => {
+  const addCourse = async () => {
     if (newCourse) {
-      const updatedCourses = [...courses, { courseName: newCourse, level: newCourseLevel, students: [] }];
-      localStorage.setItem('courses', JSON.stringify(updatedCourses));
-      setCourses(updatedCourses);
+      const newCourseData = { courseID: `${newCourse}-${newCourseLevel}`, courseName: newCourse, level: newCourseLevel, students: [] };
+      await addCourseToDB(newCourseData);
+      setCourses([...courses, newCourseData]);
       setNewCourse('');
       setNewCourseLevel(100);
     }
@@ -31,12 +41,14 @@ function Dashboard({ navigateTo }) {
 
   const deleteCourse = (courseName) => {
     const updatedCourses = courses.filter(course => course.courseName !== courseName);
-    localStorage.setItem('courses', JSON.stringify(updatedCourses));
     setCourses(updatedCourses);
   };
 
   return (
     <div className="dashboard-container">
+      <button onClick={() => setIsDarkMode(!isDarkMode)} className="toggle-button">
+        🌙
+      </button>
       <div className="sidebar">
         <div className="dropdown">
           <button className="menu-btn">☰ Menu</button>
@@ -66,7 +78,7 @@ function Dashboard({ navigateTo }) {
               <div key={index} className="course-card">
                 <h4>{course.courseName}</h4>
                 <p>Level: {course.level}</p>
-                <p>Number of Students Enrolled: {course.students.length}</p>
+                <p>Number of Students Enrolled: {course.students ? course.students.length : 0}</p>
                 <button onClick={() => generateQrCode(course.courseName)} className="button">Generate QR Code</button>
                 <button onClick={() => deleteCourse(course.courseName)} className="button">Delete Course</button>
                 {qrCodes[course.courseName] && <QRCodeCanvas value={qrCodes[course.courseName]} />}
@@ -83,9 +95,9 @@ function Dashboard({ navigateTo }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {course.students.map((student, studentIndex) => (
+                    {course.students && course.students.map((student, studentIndex) => (
                       <tr key={studentIndex}>
-                        <td>{student.name}</td>
+                        <td>{`${student.surname} ${student.firstname}`}</td>
                         <td>{student.studentID}</td>
                         <td>{student.level}</td>
                         <td>{student.classGroup}</td>
@@ -104,6 +116,7 @@ function Dashboard({ navigateTo }) {
                 </table>
               </div>
             ))}
+            <button onClick={() => navigateTo('homepage')} className="button">Go to Homepage</button>
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { getStudents, getAdmins } from '../firebaseService'; // Ensure this path is correct based on your project structure
 import './AccountList.css';
 
 function AccountList() {
@@ -6,10 +7,14 @@ function AccountList() {
   const [admins, setAdmins] = useState([]);
 
   useEffect(() => {
-    const storedStudents = JSON.parse(localStorage.getItem('students')) || [];
-    const storedAdmins = JSON.parse(localStorage.getItem('admins')) || [];
-    setStudents(storedStudents);
-    setAdmins(storedAdmins);
+    const fetchData = async () => {
+      const studentList = await getStudents();
+      const adminList = await getAdmins();
+      setStudents(studentList);
+      setAdmins(adminList);
+    };
+
+    fetchData();
   }, []);
 
   return (
@@ -23,16 +28,14 @@ function AccountList() {
               <th>Name</th>
               <th>Student ID</th>
               <th>Level</th>
-              <th>Class Group</th>
             </tr>
           </thead>
           <tbody>
-            {students.map((student, index) => (
-              <tr key={index}>
-                <td>{student.name}</td>
+            {students.map((student) => (
+              <tr key={student.studentID}>
+                <td>{`${student.surname} ${student.firstname}`}</td>
                 <td>{student.studentID}</td>
                 <td>{student.level}</td>
-                <td>{student.classGroup}</td>
               </tr>
             ))}
           </tbody>
@@ -45,19 +48,15 @@ function AccountList() {
             <tr>
               <th>Name</th>
               <th>Staff ID</th>
-              <th>Course</th>
-              <th>Level</th>
-              <th>Class Group</th>
+              <th>Email</th>
             </tr>
           </thead>
           <tbody>
-            {admins.map((admin, index) => (
-              <tr key={index}>
-                <td>{admin.name}</td>
-                <td>{admin.studentID}</td>
-                <td>{admin.course}</td>
-                <td>{admin.level}</td>
-                <td>{admin.classGroup}</td>
+            {admins.map((admin) => (
+              <tr key={admin.staffID}>
+                <td>{`${admin.surname} ${admin.firstname}`}</td>
+                <td>{admin.staffID}</td>
+                <td>{admin.email}</td>
               </tr>
             ))}
           </tbody>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import QrScanner from 'react-qr-scanner';
+import { getCourses, getStudents, updateCourse } from '../firebaseService'; // Ensure this path is correct based on your project structure
 import '../styles.css'; // Ensure this CSS file is correctly referenced
 
 function StudentDashboard() {
@@ -10,15 +11,19 @@ function StudentDashboard() {
   const [attendanceCourse, setAttendanceCourse] = useState(null);
 
   useEffect(() => {
-    const storedCourses = JSON.parse(localStorage.getItem('courses')) || [];
-    setCourses(storedCourses);
+    const fetchData = async () => {
+      const courseList = await getCourses();
+      setCourses(courseList);
 
-    const students = JSON.parse(localStorage.getItem('students')) || [];
-    const student = students.find(stu => stu.studentID === studentID);
-    setStudentDetails(student || {});
+      const studentList = await getStudents();
+      const student = studentList.find(stu => stu.studentID === studentID);
+      setStudentDetails(student || {});
+    };
+
+    fetchData();
   }, [studentID]);
 
-  const joinCourse = (courseName) => {
+  const joinCourse = async (courseName) => {
     const updatedCourses = courses.map(course => {
       if (course.courseName === courseName) {
         if (!course.students) {
@@ -30,8 +35,9 @@ function StudentDashboard() {
       }
       return course;
     });
-    localStorage.setItem('courses', JSON.stringify(updatedCourses));
+    
     setCourses(updatedCourses);
+    await updateCourse(courseName, updatedCourses.find(course => course.courseName === courseName));
   };
 
   const handleScan = (data) => {
@@ -51,7 +57,7 @@ function StudentDashboard() {
     setAttendanceCourse(null);
   };
 
-  const markAttendance = (courseName) => {
+  const markAttendance = async (courseName) => {
     const updatedCourses = courses.map(course => {
       if (course.courseName === courseName) {
         const student = course.students.find(student => student.studentID === studentID);
@@ -61,8 +67,9 @@ function StudentDashboard() {
       }
       return course;
     });
-    localStorage.setItem('courses', JSON.stringify(updatedCourses));
+
     setCourses(updatedCourses);
+    await updateCourse(courseName, updatedCourses.find(course => course.courseName === courseName));
   };
 
   return (

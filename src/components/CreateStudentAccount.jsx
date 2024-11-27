@@ -1,83 +1,137 @@
 import React, { useState } from 'react';
-import '../styles.css'; // Ensure the path is correct
+import { addStudent } from '../firebaseService'; // Ensure this path is correct based on your project structure
+import '../styles.css'; // Ensure this CSS file is correctly referenced
 
 function CreateStudentAccount({ navigateTo }) {
-  const [name, setName] = useState('');
   const [studentID, setStudentID] = useState('');
+  const [surname, setSurname] = useState('');
+  const [firstname, setFirstname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [level, setLevel] = useState(100);
-  const [classGroup, setClassGroup] = useState('A');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [level, setLevel] = useState('');
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const errors = {};
+
+    const idRegex = /^\d{10}$/;
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!idRegex.test(studentID)) {
+      errors.studentID = 'Student ID must be 10 digits long.';
+    }
+
+    if (!passwordRegex.test(password) || password.length < 8) {
+      errors.password = 'Password must be at least 8 characters long and contain at least one number or symbol.';
+    }
+
+    if (password !== confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match.';
+    }
+
+    if (!emailRegex.test(email)) {
+      errors.email = 'Invalid email format.';
+    }
+
+    setErrors(errors);
+
+    return Object.keys(errors).length === 0;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!studentID) {
-      alert('Student ID is required');
-      return;
+    if (validate()) {
+      const student = { studentID, surname, firstname, email, password, level };
+      await addStudent(student);
+      navigateTo('studentLogin');
     }
-
-    const students = JSON.parse(localStorage.getItem('students')) || [];
-    students.push({ name, studentID, email, password, level, classGroup });
-    localStorage.setItem('students', JSON.stringify(students));
-
-    navigateTo('homepage');
   };
 
   return (
-    <div className="form">
-      <h2>Create Student Account</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Name
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="input-field"
-          />
-        </label>
-        <label>
-          Student ID
-          <input
-            type="text"
-            value={studentID}
-            onChange={(e) => setStudentID(e.target.value)}
-            className="input-field"
-            required
-          />
-        </label>
-        <label>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="input-field"
-          />
-        </label>
-        <label>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="input-field"
-          />
-        </label>
-        <label>
-          Level
-          <select value={level} onChange={(e) => setLevel(parseInt(e.target.value))} className="input-field">
-            {[100, 200, 300, 400].map(l => <option key={l} value={l}>{l}</option>)}
-          </select>
-        </label>
-        <label>
-          Class Group
-          <select value={classGroup} onChange={(e) => setClassGroup(e.target.value)} className="input-field">
-            {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(group => <option key={group} value={group}>{group}</option>)}
-          </select>
-        </label>
-        <button type="submit" className="button">Create Account</button>
-      </form>
+    <div className="container">
+      <div className="form">
+        <h2>Create Student Account</h2>
+        <form onSubmit={handleSubmit}>
+          <label>
+            Student ID
+            <input
+              type="text"
+              value={studentID}
+              onChange={(e) => setStudentID(e.target.value)}
+              className="input-field"
+              required
+            />
+          </label>
+          {errors.studentID && <p className="error">{errors.studentID}</p>}
+          <label>
+            Surname
+            <input
+              type="text"
+              value={surname}
+              onChange={(e) => setSurname(e.target.value)}
+              className="input-field"
+              required
+            />
+          </label>
+          <label>
+            First Name
+            <input
+              type="text"
+              value={firstname}
+              onChange={(e) => setFirstname(e.target.value)}
+              className="input-field"
+              required
+            />
+          </label>
+          <label>
+            Email
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input-field"
+              required
+            />
+          </label>
+          {errors.email && <p className="error">{errors.email}</p>}
+          <label>
+            Password
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input-field"
+              required
+            />
+          </label>
+          {errors.password && <p className="error">{errors.password}</p>}
+          <label>
+            Confirm Password
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="input-field"
+              required
+            />
+          </label>
+          {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
+          <label>
+            Level
+            <input
+              type="text"
+              value={level}
+              onChange={(e) => setLevel(e.target.value)}
+              className="input-field"
+              required
+            />
+          </label>
+          <button type="submit" className="button">Create Account</button>
+        </form>
+        <button className="button" onClick={() => navigateTo('studentLogin')}>Back to Login</button>
+      </div>
     </div>
   );
 }
