@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import './AccountList.css';
 
 function AccountList() {
   const [students, setStudents] = useState([]);
@@ -12,24 +13,56 @@ function AccountList() {
   }, []);
 
   return (
-    <div>
+    <div className="account-list-container">
       <h2>Accounts</h2>
-      <h3>Students</h3>
-      <ul>
-        {students.map((student, index) => (
-          <li key={index}>
-            {student.name} (ID: {student.studentID})
-          </li>
-        ))}
-      </ul>
-      <h3>Admins</h3>
-      <ul>
-        {admins.map((admin, index) => (
-          <li key={index}>
-            {admin.name} (Staff ID: {admin.staffID})
-          </li>
-        ))}
-      </ul>
+      <div className="accounts-section">
+        <h3>Students</h3>
+        <table className="accounts-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Student ID</th>
+              <th>Level</th>
+              <th>Class Group</th>
+            </tr>
+          </thead>
+          <tbody>
+            {students.map((student, index) => (
+              <tr key={index}>
+                <td>{student.name}</td>
+                <td>{student.studentID}</td>
+                <td>{student.level}</td>
+                <td>{student.classGroup}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="accounts-section">
+        <h3>Admins</h3>
+        <table className="accounts-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Staff ID</th>
+              <th>Course</th>
+              <th>Level</th>
+              <th>Class Group</th>
+            </tr>
+          </thead>
+          <tbody>
+            {admins.map((admin, index) => (
+              <tr key={index}>
+                <td>{admin.name}</td>
+                <td>{admin.studentID}</td>
+                <td>{admin.course}</td>
+                <td>{admin.level}</td>
+                <td>{admin.classGroup}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

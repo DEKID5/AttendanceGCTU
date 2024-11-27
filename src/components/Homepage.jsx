@@ -14,7 +14,7 @@ function Homepage({ setView }) {
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     position: 'relative',
-    color: '#000000' // Set text color to black
+    color: '#000000',
   };
 
   const overlayStyle = {
@@ -23,18 +23,18 @@ function Homepage({ setView }) {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)'  // White overlay with transparency
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
   };
 
   const contentStyle = {
     position: 'relative',
-    zIndex: 1
+    zIndex: 1,
   };
 
   const bannerStyle = {
     width: '100%',
-    maxWidth: '600px', // Adjust as needed
-    marginBottom: '20px'
+    maxWidth: '600px',
+    marginBottom: '20px',
   };
 
   return (
@@ -47,7 +47,7 @@ function Homepage({ setView }) {
           <div className="create-options">
             <button onClick={() => setView('createStudentAccount')} className="button">Create Student Account</button>
             <button onClick={() => setView('createAdminAccount')} className="button">Create Admin Account</button>
-            <button onClick={() => setShowCreateOptions(false)} className="button">Back</button> {/* Add a back button to return to main options */}
+            <button onClick={() => setShowCreateOptions(false)} className="button">Back</button>
           </div>
         ) : (
           <div className="buttons">

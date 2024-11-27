@@ -17,9 +17,12 @@ body {
 }
 
 .form {
-  background-color: white;
+  background-color: #37415C;
   padding: 40px;
   border-radius: 10px;
+  width: 400px;
+  margin: 0 auto;
+  color: #F3DADF;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
   font-weight: bold;
@@ -29,15 +32,17 @@ h2 {
   font-size: 2em;
   font-weight: bold;
   margin-bottom: 20px;
+  color: #F3DADF;
 }
 
 .input-field {
   width: 100%;
   padding: 15px;
   margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 30px;
-  font-size: 1em;
+  border: none;
+  border-radius: 5px;
+  background-color: #F3DADF;
+  color: #37415C;
 }
 
 .button {
@@ -46,16 +51,16 @@ h2 {
   margin: 10px 0;
   font-size: 1em;
   font-weight: bold;
-  color: white;
-  background-color: #6BA3BE;
+  color: #37415C;
+  background-color: #F3DADF;
   border: none;
-  border-radius: 30px;
+  border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .button:hover {
-  background-color: #5b92ab;
+  background-color: #d6b4b9;
 }
 
 .course-card {
@@ -80,4 +85,116 @@ h2 {
   width: 100%;
   max-width: 500px;
   text-align: center;
+}
+
+.student-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.student-table th, .student-table td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+
+.student-table th {
+  background-color: #6BA3BE;
+  color: white;
+}
+
+.student-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.app {
+  position: relative;
+}
+
+.slide-enter {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.slide-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.slide-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.slide-exit-active {
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.course-card.joined {
+  background-color: #d4edda;
+}
+
+.dashboard-container {
+  display: flex;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #2a2a2a;
+  color: white;
+  padding: 20px;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.menu-btn {
+  background-color: #2a2a2a;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background-color: #2a2a2a;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  width: 100%;
+}
+
+.dropdown-menu a {
+  color: white;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-menu a:hover {
+  background-color: #575757;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dashboard-content {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #f4f4f4;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
 }

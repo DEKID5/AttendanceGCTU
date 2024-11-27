@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './styles.css';
 import Login from './components/Login';
 import StudentLogin from './components/StudentLogin';
@@ -13,72 +14,71 @@ import StudentDashboard from './components/StudentDashboard';
 import PasswordReset from './components/PasswordReset';
 
 function App() {
-  const [view, setView] = useState('homepage'); // Possible views: 'homepage', 'studentLogin', 'adminLogin', 'createStudentAccount', 'createAdminAccount', 'accountList', 'courseList', 'dashboard', 'studentDashboard', 'passwordReset'
-  const [loggedInUser, setLoggedInUser] = useState(null); // Possible values: 'student' or 'admin'
-  const [history, setHistory] = useState(['homepage']); // Navigation history
-  const [historyIndex, setHistoryIndex] = useState(0); // Current position in history
+  const [view, setView] = useState('homepage');
+  const [previousView, setPreviousView] = useState(null);
+  const [loggedInUser, setLoggedInUser] = useState(null);
 
-  const navigateTo = useCallback((page) => {
-    const newHistory = [...history.slice(0, historyIndex + 1), page];
-    setHistory(newHistory);
-    setHistoryIndex(newHistory.length - 1);
-    setView(page);
-  }, [history, historyIndex]);
+  const handleNavigate = (newView) => {
+    setPreviousView(view);
+    setView(newView);
+  };
 
-  const navigateBack = useCallback(() => {
-    if (historyIndex > 0) {
-      const newIndex = historyIndex - 1;
-      setHistoryIndex(newIndex);
-      setView(history[newIndex]);
-    }
-  }, [history, historyIndex]);
-
-  const navigateForward = useCallback(() => {
-    if (historyIndex < history.length - 1) {
-      const newIndex = historyIndex + 1;
-      setHistoryIndex(newIndex);
-      setView(history[newIndex]);
-    }
-  }, [history, historyIndex]);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'ArrowLeft') {
-        navigateBack();
-      } else if (e.key === 'ArrowRight') {
-        navigateForward();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [navigateBack, navigateForward]);
-
-  const handleLogin = (userType, studentID = null) => {
+  const handleLogin = (userType, id = null) => {
     setLoggedInUser(userType);
     if (userType === 'student') {
-      localStorage.setItem('studentID', studentID); // Store student ID in local storage
-      navigateTo('studentDashboard');
+      localStorage.setItem('studentID', id);
+      handleNavigate('studentDashboard');
     } else if (userType === 'admin') {
-      navigateTo('dashboard');
+      localStorage.setItem('staffID', id);
+      handleNavigate('dashboard');
+    }
+  };
+
+  const currentView = () => {
+    switch(view) {
+      case 'homepage':
+        return <Homepage setView={handleNavigate} />;
+      case 'login':
+        return <Login setView={handleNavigate} loggedInUser={loggedInUser} />;
+      case 'studentLogin':
+        return <StudentLogin onLogin={(studentID) => handleLogin('student', studentID)} onResetPassword={() => handleNavigate('passwordReset')} navigateTo={handleNavigate} />;
+      case 'adminLogin':
+        return <AdminLogin onLogin={(staffID) => handleLogin('admin', staffID)} onResetPassword={() => handleNavigate('passwordReset')} navigateTo={handleNavigate} />;
+      case 'createStudentAccount':
+        return <CreateStudentAccount navigateTo={handleNavigate} />;
+      case 'createAdminAccount':
+        return <CreateAdminAccount navigateTo={handleNavigate} />;
+      case 'accountList':
+        return loggedInUser === 'admin' ? <AccountList navigateTo={handleNavigate} /> : <Homepage setView={handleNavigate} />;
+      case 'courseList':
+        return loggedInUser === 'admin' ? <CourseList navigateTo={handleNavigate} /> : <Homepage setView={handleNavigate} />;
+      case 'dashboard':
+        return loggedInUser === 'admin' ? <Dashboard navigateTo={handleNavigate} /> : <Homepage setView={handleNavigate} />;
+      case 'studentDashboard':
+        return loggedInUser === 'student' ? <StudentDashboard /> : <Homepage setView={handleNavigate} />;
+      case 'passwordReset':
+        return <PasswordReset onBack={() => handleNavigate('login')} />;
+      default:
+        return <Homepage setView={handleNavigate} />;
     }
   };
 
   return (
-    <div>
-      {view === 'homepage' && <Homepage setView={navigateTo} />}
-      {view === 'login' && <Login setView={navigateTo} loggedInUser={loggedInUser} />}
-      {view === 'studentLogin' && <StudentLogin onLogin={(studentID) => handleLogin('student', studentID)} onResetPassword={() => navigateTo('passwordReset')} />}
-      {view === 'adminLogin' && <AdminLogin onLogin={() => handleLogin('admin')} onResetPassword={() => navigateTo('passwordReset')} />}
-      {view === 'createStudentAccount' && <CreateStudentAccount />}
-      {view === 'createAdminAccount' && <CreateAdminAccount />}
-      {view === 'accountList' && loggedInUser === 'admin' && <AccountList />}
-      {view === 'courseList' && loggedInUser === 'admin' && <CourseList />}
-      {view === 'dashboard' && loggedInUser === 'admin' && <Dashboard />}
-      {view === 'studentDashboard' && loggedInUser === 'student' && <StudentDashboard />}
-      {view === 'passwordReset' && <PasswordReset onBack={() => navigateTo('login')} />}
+    <div className="app">
+      <TransitionGroup>
+        <CSSTransition
+          key={view}
+          timeout={300}
+          classNames="slide"
+        >
+          <div>
+            {currentView()}
+            {previousView && (
+              <button className="button" onClick={() => handleNavigate(previousView)}>Previous</button>
+            )}
+          </div>
+        </CSSTransition>
+      </TransitionGroup>
     </div>
   );
 }

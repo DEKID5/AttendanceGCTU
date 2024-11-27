@@ -1,22 +1,32 @@
 import React, { useEffect, useState } from 'react';
-import { QrReader } from 'react-qr-reader';
+import QrScanner from 'react-qr-scanner';
+import '../styles.css'; // Ensure this CSS file is correctly referenced
 
 function StudentDashboard() {
   const [courses, setCourses] = useState([]);
   const [studentID] = useState(localStorage.getItem('studentID'));
+  const [studentDetails, setStudentDetails] = useState({});
   const [scanning, setScanning] = useState(false);
   const [attendanceCourse, setAttendanceCourse] = useState(null);
 
   useEffect(() => {
     const storedCourses = JSON.parse(localStorage.getItem('courses')) || [];
     setCourses(storedCourses);
-  }, []);
+
+    const students = JSON.parse(localStorage.getItem('students')) || [];
+    const student = students.find(stu => stu.studentID === studentID);
+    setStudentDetails(student || {});
+  }, [studentID]);
 
   const joinCourse = (courseName) => {
-    const storedCourses = JSON.parse(localStorage.getItem('courses')) || [];
-    const updatedCourses = storedCourses.map(course => {
+    const updatedCourses = courses.map(course => {
       if (course.courseName === courseName) {
-        course.students.push({ studentID });
+        if (!course.students) {
+          course.students = [];
+        }
+        if (!course.students.find(student => student.studentID === studentID)) {
+          course.students.push(studentDetails);
+        }
       }
       return course;
     });
@@ -26,9 +36,12 @@ function StudentDashboard() {
 
   const handleScan = (data) => {
     if (data) {
-      markAttendance(attendanceCourse, data);
-      setScanning(false);
-      setAttendanceCourse(null);
+      const storedQrCode = localStorage.getItem(`qrCode-${attendanceCourse}`);
+      if (data === storedQrCode) {
+        markAttendance(attendanceCourse);
+        setScanning(false);
+        setAttendanceCourse(null);
+      }
     }
   };
 
@@ -38,13 +51,12 @@ function StudentDashboard() {
     setAttendanceCourse(null);
   };
 
-  const markAttendance = (courseName, data) => {
-    const storedCourses = JSON.parse(localStorage.getItem('courses')) || [];
-    const updatedCourses = storedCourses.map(course => {
+  const markAttendance = (courseName) => {
+    const updatedCourses = courses.map(course => {
       if (course.courseName === courseName) {
         const student = course.students.find(student => student.studentID === studentID);
         if (student) {
-          student.attendance = (student.attendance || 0) + 1;
+          student.isPresent = true;
         }
       }
       return course;
@@ -58,23 +70,30 @@ function StudentDashboard() {
       <div className="form">
         <h2>Student Dashboard</h2>
         <h3>Available Courses</h3>
-        {courses.map((course, index) => (
-          <div key={index} className="course-card">
-            <h4>{course.courseName}</h4>
-            <button onClick={() => joinCourse(course.courseName)} className="button">Join Course</button>
-            <button onClick={() => { setScanning(true); setAttendanceCourse(course.courseName); }} className="button">Mark Attendance</button>
-          </div>
-        ))}
+        <div className="grid-container">
+          {courses
+            .filter(course => course.level === studentDetails.level)
+            .map((course, index) => (
+              <div key={index} className={`course-card ${course.students.some(student => student.studentID === studentID) ? 'joined' : ''}`}>
+                <h4>{course.courseName}</h4>
+                {course.students.some(student => student.studentID === studentID) ? (
+                  <button className="button" onClick={() => { setScanning(true); setAttendanceCourse(course.courseName); }}>Mark Attendance</button>
+                ) : (
+                  <button className="button" onClick={() => joinCourse(course.courseName)}>Join Course</button>
+                )}
+              </div>
+            ))}
+        </div>
 
         {scanning && (
           <div className="qr-scanner">
-            <QrReader
+            <QrScanner
               delay={300}
               onError={handleError}
               onScan={handleScan}
               style={{ width: '100%' }}
             />
-            <button onClick={() => setScanning(false)} className="button">Cancel</button>
+            <button className="button" onClick={() => setScanning(false)}>Cancel</button>
           </div>
         )}
       </div>
