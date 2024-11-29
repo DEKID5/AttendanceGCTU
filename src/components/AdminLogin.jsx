@@ -1,13 +1,46 @@
 import React, { useState } from 'react';
-import '../styles.css'; // Ensure this CSS file is correctly referenced
+import { useNavigate } from 'react-router-dom';
+import { authenticateUser } from '../firebaseService';
+import '../styles.css';
 
-function AdminLogin({ onLogin, onResetPassword, navigateTo }) {
-  const [email, setEmail] = useState('');
+function AdminLogin({ onLogin }) {
+  const navigate = useNavigate();
+  const [staffID, setStaffID] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState({});
+  const [loginFailed, setLoginFailed] = useState(false);
 
-  const handleSubmit = (e) => {
+  const validate = () => {
+    const errors = {};
+    if (!staffID) {
+      errors.staffID = 'Staff ID is required.';
+    }
+    if (!password) {
+      errors.password = 'Password is required.';
+    }
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onLogin(email, password);
+    if (validate()) {
+      try {
+        await authenticateUser('admins', staffID, password);
+        onLogin(staffID);
+        navigate('/dashboard');
+      } catch (error) {
+        if (error.message === 'Invalid credentials.') {
+          setLoginFailed(true);
+        } else {
+          console.error(error);
+        }
+      }
+    }
+  };
+
+  const handleResetPassword = () => {
+    navigate('/passwordReset');
   };
 
   return (
@@ -16,15 +49,16 @@ function AdminLogin({ onLogin, onResetPassword, navigateTo }) {
         <h2>Admin Login</h2>
         <form onSubmit={handleSubmit}>
           <label>
-            Email
+            Staff ID
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={staffID}
+              onChange={(e) => setStaffID(e.target.value)}
               className="input-field"
               required
             />
           </label>
+          {errors.staffID && <p className="error">{errors.staffID}</p>}
           <label>
             Password
             <input
@@ -35,10 +69,12 @@ function AdminLogin({ onLogin, onResetPassword, navigateTo }) {
               required
             />
           </label>
+          {errors.password && <p className="error">{errors.password}</p>}
           <button type="submit" className="button">Login</button>
-          <button type="button" className="button" onClick={onResetPassword}>Reset Password</button>
+          <button type="button" className="button" onClick={handleResetPassword}>Reset Password</button>
         </form>
-        <button className="button" onClick={() => navigateTo('homepage')}>Previous</button>
+        {loginFailed && <p className="error">Invalid credentials. Please try again.</p>}
+        <button className="button" onClick={() => navigate('/')}>Previous</button>
       </div>
     </div>
   );

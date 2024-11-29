@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './styles.css';
 import Login from './components/Login';
@@ -12,74 +13,65 @@ import Dashboard from './components/Dashboard';
 import Homepage from './components/Homepage';
 import StudentDashboard from './components/StudentDashboard';
 import PasswordReset from './components/PasswordReset';
+import { getCourses, addCourse as addCourseToDB } from './firebaseService';
 
-function App() {
-  const [view, setView] = useState('homepage');
-  const [previousView, setPreviousView] = useState(null);
+function AppContent() {
   const [loggedInUser, setLoggedInUser] = useState(null);
+  const [courses, setCourses] = useState([]);
 
-  const handleNavigate = (newView) => {
-    setPreviousView(view);
-    setView(newView);
-  };
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const courseList = await getCourses();
+      setCourses(courseList);
+    };
+
+    fetchCourses();
+  }, []);
 
   const handleLogin = (userType, id = null) => {
     setLoggedInUser(userType);
     if (userType === 'student') {
       localStorage.setItem('studentID', id);
-      handleNavigate('studentDashboard');
+      navigate('/studentDashboard');
     } else if (userType === 'admin') {
       localStorage.setItem('staffID', id);
-      handleNavigate('dashboard');
+      navigate('/dashboard');
     }
   };
 
-  const currentView = () => {
-    switch(view) {
-      case 'homepage':
-        return <Homepage setView={handleNavigate} />;
-      case 'login':
-        return <Login setView={handleNavigate} loggedInUser={loggedInUser} />;
-      case 'studentLogin':
-        return <StudentLogin onLogin={(studentID) => handleLogin('student', studentID)} onResetPassword={() => handleNavigate('passwordReset')} navigateTo={handleNavigate} />;
-      case 'adminLogin':
-        return <AdminLogin onLogin={(staffID) => handleLogin('admin', staffID)} onResetPassword={() => handleNavigate('passwordReset')} navigateTo={handleNavigate} />;
-      case 'createStudentAccount':
-        return <CreateStudentAccount navigateTo={handleNavigate} />;
-      case 'createAdminAccount':
-        return <CreateAdminAccount navigateTo={handleNavigate} />;
-      case 'accountList':
-        return loggedInUser === 'admin' ? <AccountList navigateTo={handleNavigate} /> : <Homepage setView={handleNavigate} />;
-      case 'courseList':
-        return loggedInUser === 'admin' ? <CourseList navigateTo={handleNavigate} /> : <Homepage setView={handleNavigate} />;
-      case 'dashboard':
-        return loggedInUser === 'admin' ? <Dashboard navigateTo={handleNavigate} /> : <Homepage setView={handleNavigate} />;
-      case 'studentDashboard':
-        return loggedInUser === 'student' ? <StudentDashboard /> : <Homepage setView={handleNavigate} />;
-      case 'passwordReset':
-        return <PasswordReset onBack={() => handleNavigate('login')} />;
-      default:
-        return <Homepage setView={handleNavigate} />;
-    }
+  const addCourse = async (newCourse) => {
+    await addCourseToDB(newCourse);
+    setCourses([...courses, newCourse]);
   };
 
   return (
-    <div className="app">
-      <TransitionGroup>
-        <CSSTransition
-          key={view}
-          timeout={300}
-          classNames="slide"
-        >
-          <div>
-            {currentView()}
-            {previousView && (
-              <button className="button" onClick={() => handleNavigate(previousView)}>Previous</button>
-            )}
-          </div>
-        </CSSTransition>
-      </TransitionGroup>
-    </div>
+    <TransitionGroup>
+      <CSSTransition timeout={500} classNames="slide">
+        <Routes>
+          <Route path="/" element={<Homepage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/studentLogin" element={<StudentLogin onLogin={(studentID) => handleLogin('student', studentID)} />} />
+          <Route path="/adminLogin" element={<AdminLogin onLogin={(staffID) => handleLogin('admin', staffID)} />} />
+          <Route path="/createStudentAccount" element={<CreateStudentAccount />} />
+          <Route path="/createAdminAccount" element={<CreateAdminAccount />} />
+          <Route path="/accountList" element={loggedInUser === 'admin' ? <AccountList /> : <Homepage />} />
+          <Route path="/courseList" element={loggedInUser === 'admin' ? <CourseList courses={courses} /> : <Homepage />} />
+          <Route path="/dashboard" element={loggedInUser === 'admin' ? <Dashboard courses={courses} addCourse={addCourse} /> : <Homepage />} />
+          <Route path="/studentDashboard" element={loggedInUser === 'student' ? <StudentDashboard courses={courses} /> : <Homepage />} />
+          <Route path="/passwordReset" element={<PasswordReset />} />
+        </Routes>
+      </CSSTransition>
+    </TransitionGroup>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
 

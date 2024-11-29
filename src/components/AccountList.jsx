@@ -1,62 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import { getStudents, getAdmins } from '../firebaseService'; // Ensure this path is correct based on your project structure
-import './AccountList.css';
+import { getStudents } from '../firebaseService';
+import '../styles.css';
 
 function AccountList() {
   const [students, setStudents] = useState([]);
-  const [admins, setAdmins] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const studentList = await getStudents();
-      const adminList = await getAdmins();
-      setStudents(studentList);
-      setAdmins(adminList);
+      const studentsList = await getStudents();
+      setStudents(studentsList);
     };
-
     fetchData();
   }, []);
 
   return (
-    <div className="account-list-container">
-      <h2>Accounts</h2>
-      <div className="accounts-section">
-        <h3>Students</h3>
-        <table className="accounts-table">
+    <div className="container">
+      <div className="form">
+        <h2>Student Accounts</h2>
+        <table className="student-table">
           <thead>
             <tr>
-              <th>Name</th>
               <th>Student ID</th>
+              <th>Surname</th>
+              <th>Firstname</th>
+              <th>Email</th>
               <th>Level</th>
             </tr>
           </thead>
           <tbody>
-            {students.map((student) => (
-              <tr key={student.studentID}>
-                <td>{`${student.surname} ${student.firstname}`}</td>
+            {students.map((student, index) => (
+              <tr key={index}>
                 <td>{student.studentID}</td>
+                <td>{student.surname}</td>
+                <td>{student.firstname}</td>
+                <td>{student.email}</td>
                 <td>{student.level}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="accounts-section">
-        <h3>Admins</h3>
-        <table className="accounts-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Staff ID</th>
-              <th>Email</th>
-            </tr>
-          </thead>
-          <tbody>
-            {admins.map((admin) => (
-              <tr key={admin.staffID}>
-                <td>{`${admin.surname} ${admin.firstname}`}</td>
-                <td>{admin.staffID}</td>
-                <td>{admin.email}</td>
               </tr>
             ))}
           </tbody>

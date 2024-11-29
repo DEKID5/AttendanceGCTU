@@ -1,63 +1,66 @@
 const express = require('express');
-const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+const bodyParser = require('body-parser');
+// Remove firebase-admin and nodemailer imports
+
 const app = express();
+app.use(bodyParser.json());
 
-// Middleware
-app.use(express.json());
+// Replace this with your database setup
+const database = {};
 
-// In-memory storage for OTPs (for demonstration purposes)
-const otpStorage = {};
+// Function to generate OTP
+const generateOtp = () => {
+  return Math.floor(10000 + Math.random() * 90000).toString();
+};
 
-// Generate OTP
-app.post('/generate-otp', (req, res) => {
+// Send OTP endpoint
+app.post('/send-otp', async (req, res) => {
   const { email } = req.body;
-  const otp = crypto.randomInt(100000, 999999).toString();
-  otpStorage[email] = otp;
 
-  // Send OTP via email
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'your-email@gmail.com',
-      pass: 'your-email-password', // Use an App Password if you're using Gmail with 2-step verification
-    },
-  });
+  // Generate and save OTP in your database
+  const otp = generateOtp();
+  database[email] = { otp, timestamp: Date.now() };
 
-  const mailOptions = {
-    from: 'your-email@gmail.com',
-    to: email,
-    subject: 'Your OTP Code',
-    text: `Your OTP code is ${otp}`,
-  };
+  // Replace this with your preferred method to send OTP (e.g., an email service)
+  console.log(`Send OTP ${otp} to email: ${email}`);
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error('Error sending email:', error); // Log the specific error
-      return res.status(500).send('Error sending email');
-    }
-    res.status(200).send('OTP sent');
-  });
+  res.status(200).send({ message: 'OTP sent to email' });
 });
 
-// Verify OTP and reset password
-app.post('/reset-password', (req, res) => {
-  const { email, otp, newPassword, confirmPassword } = req.body;
+// Verify OTP endpoint
+app.post('/verify-otp', async (req, res) => {
+  const { email, otp } = req.body;
 
-  if (otpStorage[email] !== otp) {
-    return res.status(400).send('Invalid OTP');
+  const record = database[email];
+  if (!record) {
+    return res.status(404).send({ error: 'OTP not found' });
   }
 
-  if (newPassword !== confirmPassword) {
-    return res.status(400).send('Passwords do not match');
+  const { otp: storedOtp, timestamp } = record;
+
+  // Check OTP and validity (e.g., 10 minutes)
+  const isValid = storedOtp === otp && Date.now() - timestamp < 10 * 60 * 1000;
+  if (!isValid) {
+    return res.status(400).send({ error: 'Invalid or expired OTP' });
   }
 
-  // Reset the password in your database (for demonstration, not implemented)
-  // db.updatePassword(email, newPassword);
-
-  res.status(200).send('Password reset successful');
+  res.status(200).send({ message: 'OTP verified' });
 });
 
-app.listen(30001, () => {
-  console.log('Server running on port 3001');
+// Reset password endpoint
+app.post('/reset-password', async (req, res) => {
+  const { email, password } = req.body;
+
+  // Replace this with your preferred method to update the password in your database
+  database[email].password = password;
+
+  // Remove OTP from your database
+  delete database[email].otp;
+
+  res.status(200).send({ message: 'Password updated' });
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });

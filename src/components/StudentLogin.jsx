@@ -1,34 +1,46 @@
 import React, { useState } from 'react';
-import '../styles.css'; // Ensure this CSS file is correctly referenced
+import { useNavigate } from 'react-router-dom';
+import { authenticateUser } from '../firebaseService';
+import '../styles.css';
 
-function StudentLogin({ onLogin, onResetPassword, navigateTo }) {
+function StudentLogin({ onLogin }) {
+  const navigate = useNavigate();
   const [studentID, setStudentID] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
+  const [loginFailed, setLoginFailed] = useState(false);
 
   const validate = () => {
     const errors = {};
-
-    const idRegex = /^\d{10}$/;
-    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])/;
-
-    if (!idRegex.test(studentID)) {
-      errors.studentID = 'Student ID must be 10 digits long.';
+    if (!studentID) {
+      errors.studentID = 'Student ID is required.';
     }
-
-    if (!passwordRegex.test(password) || password.length < 8) {
-      errors.password = 'Password must be at least 8 characters long and contain at least one number or symbol.';
+    if (!password) {
+      errors.password = 'Password is required.';
     }
-
     setErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
-      onLogin(studentID, password);
+      try {
+        await authenticateUser('students', studentID, password);
+        onLogin(studentID);
+        navigate('/studentDashboard');
+      } catch (error) {
+        if (error.message === 'Invalid credentials.') {
+          setLoginFailed(true);
+        } else {
+          console.error(error);
+        }
+      }
     }
+  };
+
+  const handleResetPassword = () => {
+    navigate('/passwordReset');
   };
 
   return (
@@ -59,9 +71,9 @@ function StudentLogin({ onLogin, onResetPassword, navigateTo }) {
           </label>
           {errors.password && <p className="error">{errors.password}</p>}
           <button type="submit" className="button">Login</button>
-          <button type="button" className="button" onClick={onResetPassword}>Reset Password</button>
+          <button type="button" className="button" onClick={handleResetPassword}>Reset Password</button>
         </form>
-        <button className="button" onClick={() => navigateTo('homepage')}>Previous</button>
+        {loginFailed && <p className="error">Invalid credentials. Please try again.</p>}
       </div>
     </div>
   );

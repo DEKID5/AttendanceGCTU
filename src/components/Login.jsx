@@ -1,19 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../styles.css';
 
-function Login({ setView, loggedInUser }) {
+function Login() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    // Implement login logic here
+    // Navigate to a different route after successful login
+    navigate('/dashboard');
+  };
+
   return (
-    <div className="container">
-      <div className="form">
-        <h2>Login</h2>
-        <button onClick={() => setView('studentLogin')} className="button">Student Login</button>
-        <button onClick={() => setView('adminLogin')} className="button">Admin Login</button>
-        {loggedInUser === 'admin' && (
-          <>
-            <button onClick={() => setView('accountList')} className="button">View Accounts</button>
-            <button onClick={() => setView('courseList')} className="button">View Courses</button>
-          </>
-        )}
-        <button onClick={() => setView('homepage')} className="button">Back</button> {/* Add Back button */}
+    <div className="login-container">
+      <div className="login-form">
+        <h2>Log In</h2>
+        <form onSubmit={handleLogin}>
+          <input
+            type="text"
+            placeholder="User name / Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit">LOG IN NOW</button>
+        </form>
       </div>
     </div>
   );

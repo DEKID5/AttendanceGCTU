@@ -1,84 +1,87 @@
-import { db } from './firebaseConfig';
-import { collection, doc, setDoc, getDocs, updateDoc } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, addDoc, doc, updateDoc, getDocs, query, where, arrayUnion, deleteDoc, onSnapshot } from 'firebase/firestore';
 
-// Function to add a student with a specific ID
-const addStudent = async (student) => {
-  try {
-    await setDoc(doc(db, 'students', student.studentID), student);
-    console.log('Student added:', student);
-  } catch (error) {
-    console.error('Error adding student:', error);
-  }
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: 'AIzaSyC7AyGz_yKZPMcBUgqWCs6oV6-yvklFws0',
+  authDomain: 'attendance-app-7aefe.firebaseapp.com',
+  projectId: 'attendance-app-7aefe',
+  storageBucket: 'attendance-app-7aefe.appspot.com',
+  messagingSenderId: '71551212270',
+  appId: '1:71551212270:web:52bbfc06c6993de1abb1ff',
+  measurementId: 'G-P3B2Z8FWVF'
 };
 
-// Function to add an admin with a specific ID
-const addAdmin = async (admin) => {
-  try {
-    await setDoc(doc(db, 'admins', admin.staffID), admin);
-    console.log('Admin added:', admin);
-  } catch (error) {
-    console.error('Error adding admin:', error);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+export const addStudent = async (student) => {
+  const q = query(collection(db, 'students'), where('studentID', '==', student.studentID));
+  const querySnapshot = await getDocs(q);
+  if (!querySnapshot.empty) {
+    throw new Error('Student ID already exists.');
   }
+  await addDoc(collection(db, 'students'), student);
 };
 
-// Function to add a course with a specific ID
-const addCourse = async (course) => {
-  try {
-    await setDoc(doc(db, 'courses', course.courseID), course);
-    console.log('Course added:', course);
-  } catch (error) {
-    console.error('Error adding course:', error);
+export const addAdmin = async (admin) => {
+  const q = query(collection(db, 'admins'), where('staffID', '==', admin.staffID));
+  const querySnapshot = await getDocs(q);
+  if (!querySnapshot.empty) {
+    throw new Error('Staff ID already exists.');
   }
+  await addDoc(collection(db, 'admins'), admin);
 };
 
-// Function to get all students
-const getStudents = async () => {
-  try {
-    const studentsCollection = collection(db, 'students');
-    const studentSnapshot = await getDocs(studentsCollection);
-    const studentList = studentSnapshot.docs.map(doc => doc.data());
-    return studentList;
-  } catch (error) {
-    console.error('Error getting students:', error);
-    return [];
-  }
+export const addCourse = async (course) => {
+  await addDoc(collection(db, 'courses'), course);
 };
 
-// Function to get all admins
-const getAdmins = async () => {
-  try {
-    const adminsCollection = collection(db, 'admins');
-    const adminSnapshot = await getDocs(adminsCollection);
-    const adminList = adminSnapshot.docs.map(doc => doc.data());
-    return adminList;
-  } catch (error) {
-    console.error('Error getting admins:', error);
-    return [];
-  }
+export const joinCourse = async (courseID, student) => {
+  const courseRef = doc(db, 'courses', courseID);
+  await updateDoc(courseRef, {
+    students: arrayUnion(student)
+  });
 };
 
-// Function to get all courses
-const getCourses = async () => {
-  try {
-    const coursesCollection = collection(db, 'courses');
-    const courseSnapshot = await getDocs(coursesCollection);
-    const courseList = courseSnapshot.docs.map(doc => doc.data());
-    return courseList;
-  } catch (error) {
-    console.error('Error getting courses:', error);
-    return [];
-  }
+export const getCourses = async () => {
+  const querySnapshot = await getDocs(collection(db, 'courses'));
+  return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
 };
 
-// Function to update a course
-const updateCourse = async (courseID, courseData) => {
-  try {
-    const courseRef = doc(db, 'courses', courseID);
-    await updateDoc(courseRef, courseData);
-    console.log('Course updated:', courseData);
-  } catch (error) {
-    console.error('Error updating course:', error);
-  }
+// Function to get real-time updates
+export const getCourseListener = (callback) => {
+  const unsubscribe = onSnapshot(collection(db, 'courses'), (snapshot) => {
+    const coursesList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    callback(coursesList);
+  });
+  return unsubscribe;
 };
 
-export { addStudent, addAdmin, addCourse, getStudents, getAdmins, getCourses, updateCourse };
+export const getStudents = async () => {
+  const querySnapshot = await getDocs(collection(db, 'students'));
+  return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+};
+
+export const authenticateUser = async (collectionName, id, password) => {
+  const idField = collectionName === 'admins' ? 'staffID' : 'studentID';
+  const q = query(collection(db, collectionName), where(idField, '==', id), where('password', '==', password));
+  const querySnapshot = await getDocs(q);
+  if (querySnapshot.empty) {
+    throw new Error('Invalid credentials.');
+  }
+  return querySnapshot.docs[0].data();
+};
+
+export const updateAttendance = async (courseID, studentID) => {
+  const courseRef = doc(db, 'courses', courseID);
+  await updateDoc(courseRef, {
+    [`attendance.${studentID}`]: true
+  });
+};
+
+export const deleteCourseFromDB = async (courseID) => {
+  await deleteDoc(doc(db, 'courses', courseID));
+};
+
+export default db;

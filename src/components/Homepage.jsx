@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import '../styles.css'; // Ensure this CSS file exists and is referenced correctly
 
-function Homepage({ setView }) {
-  const [showLoginOptions, setShowLoginOptions] = useState(false);
-  const [showCreateOptions, setShowCreateOptions] = useState(false);
+function Homepage() {
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
+  const [showLoginOptions, setShowLoginOptions] = useState(false);
+  const [showSignupOptions, setShowSignupOptions] = useState(false);
 
   useEffect(() => {
     document.body.classList.toggle('dark', isDarkMode);
@@ -16,31 +17,41 @@ function Homepage({ setView }) {
       <button onClick={() => setIsDarkMode(!isDarkMode)} className="toggle-button">
         🌙 {isDarkMode ? 'Light Mode' : 'Dark Mode'}
       </button>
-      <div className="overlay"></div>
-      <div className="content" style={{ marginRight: '5%' }}>
-        <img src="/top-banner.png" alt="Top Banner" className="banner" />
-        {!showLoginOptions ? (
-          <button className="button" onClick={() => setShowLoginOptions(true)}>Login</button>
-        ) : (
-          <div>
-            <button className="button" onClick={() => setView('adminLogin')}>Admin Login</button>
-            <button className="button" onClick={() => setView('studentLogin')}>Student Login</button>
-            <button className="button" onClick={() => setShowLoginOptions(false)}>Back</button>
-          </div>
-        )}
-      </div>
-      <div className="content">
-        <h2>Hi There!</h2>
-        <p>If you don't have an account, you can Sign Up here!</p>
-        {showCreateOptions ? (
-          <div className="create-options">
-            <button onClick={() => setView('createStudentAccount')} className="button">Create Student Account</button>
-            <button onClick={() => setView('createAdminAccount')} className="button">Create Admin Account</button>
-            <button onClick={() => setShowCreateOptions(false)} className="button">Back</button>
-          </div>
-        ) : (
-          <button onClick={() => setShowCreateOptions(true)} className="button">SIGN UP</button>
-        )}
+      <div className="glass-effect">
+        <h1 className="title">GCTU ATTENDANCE SYSTEM</h1>
+        <div className="top-banner"></div> {/* Add the top banner */}
+        <div className="form-container">
+          {!showLoginOptions && !showSignupOptions ? (
+            <>
+              <button className="button" onClick={() => setShowLoginOptions(true)}>Login</button>
+              <button className="button" onClick={() => setShowSignupOptions(true)}>Signup</button>
+            </>
+          ) : (
+            <>
+              {showLoginOptions ? (
+                <>
+                  <Link to="/studentLogin">
+                    <button className="button">Student Login</button>
+                  </Link>
+                  <Link to="/adminLogin">
+                    <button className="button">Admin Login</button>
+                  </Link>
+                  <button className="button" onClick={() => setShowLoginOptions(false)}>Back</button>
+                </>
+              ) : (
+                <>
+                  <Link to="/createStudentAccount">
+                    <button className="button">Create Student Account</button>
+                  </Link>
+                  <Link to="/createAdminAccount">
+                    <button className="button">Create Admin Account</button>
+                  </Link>
+                  <button className="button" onClick={() => setShowSignupOptions(false)}>Back</button>
+                </>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

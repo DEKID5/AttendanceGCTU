@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { addStudent } from '../firebaseService'; // Ensure this path is correct based on your project structure
-import '../styles.css'; // Ensure this CSS file is correctly referenced
+import { useNavigate } from 'react-router-dom';
+import { addStudent } from '../firebaseService'; 
+import '../styles.css';
 
-function CreateStudentAccount({ navigateTo }) {
+function CreateStudentAccount() {
+  const navigate = useNavigate();
   const [studentID, setStudentID] = useState('');
   const [surname, setSurname] = useState('');
   const [firstname, setFirstname] = useState('');
@@ -11,6 +13,7 @@ function CreateStudentAccount({ navigateTo }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [level, setLevel] = useState('');
   const [errors, setErrors] = useState({});
+  const [accountExists, setAccountExists] = useState(false);
 
   const validate = () => {
     const errors = {};
@@ -36,7 +39,6 @@ function CreateStudentAccount({ navigateTo }) {
     }
 
     setErrors(errors);
-
     return Object.keys(errors).length === 0;
   };
 
@@ -44,8 +46,16 @@ function CreateStudentAccount({ navigateTo }) {
     e.preventDefault();
     if (validate()) {
       const student = { studentID, surname, firstname, email, password, level };
-      await addStudent(student);
-      navigateTo('studentLogin');
+      try {
+        await addStudent(student);
+        navigate('/studentLogin');
+      } catch (error) {
+        if (error.message === 'Student ID already exists.') {
+          setAccountExists(true);
+        } else {
+          console.error(error);
+        }
+      }
     }
   };
 
@@ -130,7 +140,8 @@ function CreateStudentAccount({ navigateTo }) {
           </label>
           <button type="submit" className="button">Create Account</button>
         </form>
-        <button className="button" onClick={() => navigateTo('studentLogin')}>Back to Login</button>
+        {accountExists && <p className="error">Account with this Student ID already exists.</p>}
+        <button className="button" onClick={() => navigate('/studentLogin')}>Back to Login</button>
       </div>
     </div>
   );

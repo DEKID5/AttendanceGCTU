@@ -1,6 +1,27 @@
+:root {
+  --background-color: white;
+  --text-color: #000;
+  --primary-color: #37415C;
+  --secondary-color: #F3DADF;
+  --button-hover-color: #d6b4b9;
+  --sidebar-color: #2a2a2a;
+  --menu-hover-color: #575757;
+}
+
+body.dark {
+  --background-color: #121212;
+  --text-color: #ffffff;
+  --primary-color: #1c1c1c;
+  --secondary-color: #333;
+  --button-hover-color: #555;
+  --sidebar-color: #1a1a1a;
+  --menu-hover-color: #444;
+}
+
 body {
+  background-color: var(--background-color);
+  color: var(--text-color);
   font-family: 'Serif';
-  background-color: white;
   margin: 0;
   padding: 0;
   display: flex;
@@ -8,15 +29,130 @@ body {
   align-items: center;
 }
 
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--background-color);
+}
+
+.form {
+  background-color: var(--primary-color);
+  padding: 40px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  color: var(--secondary-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-weight: bold;
+}
+
+h2 {
+  font-size: 2em;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: var(--secondary-color);
+}
+
+.input-field {
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+}
+
+.button {
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0;
+  font-size: 1em;
+  font-weight: bold;
+  color: var(--primary-color);
+  background-color: var(--secondary-color);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: var(--button-hover-color);
+}
+
+.toggle-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 10px 20px;
+  font-size: 1.5em;
+  color: var(--text-color);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.menu-container {
+  margin-top: 50px;
+  padding-top: 20px;
+}
+
+.course-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: var(--background-color);
+}
+
+.qr-scanner {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.student-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.student-table th, .student-table td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+
+.student-table th {
+  background-color: #6BA3BE;
+  color: white;
+}
+
+.student-table tr:hover {
+  background-color: #f1f1f1;
+}
+
 .dashboard-container {
   display: flex;
+  flex-wrap: wrap;
 }
 
 .sidebar {
-  width: 250px;
-  background-color: #2a2a2a;
+  width: 100%;
+  max-width: 250px;
+  background-color: var(--sidebar-color);
   color: white;
   padding: 20px;
+  border-radius: 10px;
+  margin-right: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  flex: 1;
 }
 
 .dropdown {
@@ -24,91 +160,26 @@ body {
 }
 
 .menu-btn {
-  background-color: #2a2a2a;
+  background-color: var(--sidebar-color);
   color: white;
   border: none;
   padding: 10px 20px;
   cursor: pointer;
   width: 100%;
   text-align: left;
+  font-weight: bold;
 }
 
 .dropdown-menu {
   display: none;
   position: absolute;
-  background-color: #2a2a2a;
+  background-color: var(--sidebar-color);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 1;
   width: 100%;
 }
 
-.dropdown-menu a,
-.dropdown-menu button {
+.dropdown-menu a {
   color: white;
   padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-  background: none;
-  border: none;
-  text-align: left;
-}
-
-.dropdown-menu a:hover,
-.dropdown-menu button:hover {
-  background-color: #575757;
-}
-
-.dropdown:hover .dropdown-menu {
-  display: block;
-}
-
-.dashboard-content {
-  flex-grow: 1;
-  padding: 20px;
-  background-color: #f4f4f4;
-}
-
-.button {
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.button:hover {
-  background-color: #5a6268;
-}
-
-.input-field {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-}
-
-.course-card {
-  background-color: white;
-  padding: 20px;
-  border-radius: 5px;
-  margin-top: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.student-table {
-  width: 100%;
-  margin-top: 20px;
-  border-collapse: collapse;
-}
-
-.student-table th,
-.student-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
-}
-
-.student-table th {
-  background-color: #6c757d;
-  color: white;
 }

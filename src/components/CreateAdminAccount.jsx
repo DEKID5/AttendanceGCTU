@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { addAdmin } from '../firebaseService'; // Ensure this path is correct based on your project structure
-import '../styles.css'; // Ensure this CSS file is correctly referenced
+import { useNavigate } from 'react-router-dom';
+import { addAdmin } from '../firebaseService'; 
+import '../styles.css';
 
-function CreateAdminAccount({ navigateTo }) {
+function CreateAdminAccount() {
+  const navigate = useNavigate();
   const [staffID, setStaffID] = useState('');
   const [surname, setSurname] = useState('');
   const [firstname, setFirstname] = useState('');
@@ -10,6 +12,7 @@ function CreateAdminAccount({ navigateTo }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
+  const [accountExists, setAccountExists] = useState(false);
 
   const validate = () => {
     const errors = {};
@@ -42,8 +45,16 @@ function CreateAdminAccount({ navigateTo }) {
     e.preventDefault();
     if (validate()) {
       const admin = { staffID, surname, firstname, email, password };
-      await addAdmin(admin);
-      navigateTo('adminLogin');
+      try {
+        await addAdmin(admin);
+        navigate('/adminLogin');
+      } catch (error) {
+        if (error.message === 'Staff ID already exists.') {
+          setAccountExists(true);
+        } else {
+          console.error(error);
+        }
+      }
     }
   };
 
@@ -118,7 +129,8 @@ function CreateAdminAccount({ navigateTo }) {
           {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
           <button type="submit" className="button">Create Account</button>
         </form>
-        <button className="button" onClick={() => navigateTo('adminLogin')}>Back to Login</button>
+        {accountExists && <p className="error">Account with this Staff ID already exists.</p>}
+        <button className="button" onClick={() => navigate('/adminLogin')}>Back to Login</button>
       </div>
     </div>
   );
