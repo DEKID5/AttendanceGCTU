@@ -23,8 +23,12 @@ function AppContent() {
 
   useEffect(() => {
     const fetchCourses = async () => {
-      const courseList = await getCourses();
-      setCourses(courseList);
+      try {
+        const courseList = await getCourses();
+        setCourses(courseList);
+      } catch (error) {
+        console.error('Failed to fetch courses:', error);
+      }
     };
 
     fetchCourses();

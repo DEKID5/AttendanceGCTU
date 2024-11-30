@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QRCodeCanvas } from 'qrcode.react';
 import '../styles.css';
-import { deleteCourseFromDB, addCourse as addCourseToDB, getCourseListener } from '../firebaseService'; // Removed getCourses import
+import { addCourse as addCourseToDB, getCourseListener } from '../firebaseService';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -15,7 +15,6 @@ function Dashboard() {
     level: '',
     classGroup: 'A'
   });
-  const [showDelete, setShowDelete] = useState(null);
   const [qrPopup, setQrPopup] = useState({ show: false, courseName: '' });
 
   useEffect(() => {
@@ -48,19 +47,18 @@ function Dashboard() {
     try {
       await addCourseToDB(newCourse);
       setNewCourse({ courseName: '', level: '', classGroup: 'A' });
-      document.getElementById('add-course-form').style.display = 'none';
+      toggleMenu('add-course-form');
     } catch (error) {
       console.error('Failed to add course:', error);
     }
   };
 
-  const handleDeleteCourse = async (courseID) => {
-    if (window.confirm('Are you sure you want to delete this course?')) {
-      try {
-        await deleteCourseFromDB(courseID);
-      } catch (error) {
-        console.error('Failed to delete course:', error);
-      }
+  const toggleMenu = (menuId) => {
+    const menu = document.getElementById(menuId);
+    if (menu.style.display === 'block') {
+      menu.style.display = 'none';
+    } else {
+      menu.style.display = 'block';
     }
   };
 
@@ -98,7 +96,6 @@ function Dashboard() {
                         name={`attendance-${studentIndex}-week${week + 1}`}
                         checked={student.attendance?.[week] || false}
                         readOnly
-                        style={{ backgroundColor: student.attendance?.[week] ? 'green' : 'transparent' }}
                       />
                     </td>
                   ))}
@@ -118,33 +115,34 @@ function Dashboard() {
     setQrPopup({ show: false, courseName: '' });
   };
 
-  const handleContextMenu = (event, courseID) => {
-    event.preventDefault();
-    setShowDelete(courseID);
-  };
-
-  const handleMouseDown = (courseID) => {
-    let timer;
-    timer = setTimeout(() => {
-      setShowDelete(courseID);
-    }, 800);
-
-    return () => clearTimeout(timer);
-  };
-
   return (
     <div className="dashboard-container full-page">
       <div className="sidebar">
         <h2>HiTech University</h2>
         <div className="menu-container">
-          <button className="menu-btn" onClick={() => navigate('/courseList')}>View Courses</button>
-          <button className="menu-btn" onClick={() => document.getElementById('add-course-form').style.display = 'block'}>Add Course</button>
+          <button className="menu-btn" onClick={() => toggleMenu('view-courses')}>View Courses</button>
+          <button className="menu-btn" onClick={() => toggleMenu('add-course-form')}>Add Course</button>
           <button className="menu-btn" onClick={() => setIsDarkMode(!isDarkMode)}>
             🌙 Toggle Dark Mode
           </button>
+          <div id="view-courses" style={{ display: 'none' }}>
+            {courses.map((course) => (
+              <div
+                key={course.id}
+                className="course-section square-tile"
+                style={{ padding: '10px', margin: '5px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                onClick={() => {
+                  toggleCourse(course.courseName);
+                  toggleMenu('view-courses');
+                }}
+              >
+                <h3>{course.courseName}</h3>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-      <div className="dashboard-content">
+      <div className="dashboard-content" style={{ marginLeft: '260px', padding: '20px' }}>
         <h2>Admin Dashboard</h2>
         <div id="add-course-form" style={{ display: 'none' }}>
           <h3>Add a New Course</h3>
@@ -173,34 +171,25 @@ function Dashboard() {
           </select>
           <button onClick={handleAddCourse} className="button">Add Course</button>
         </div>
-        <div className="course-list-grid">
-          {courses.map((course, index) => (
-            <div
-              key={index}
-              className="course-section square-tile"
-              onContextMenu={(event) => handleContextMenu(event, course.id)}
-              onMouseDown={() => handleMouseDown(course.id)}
-            >
-              <h3 onClick={() => toggleCourse(course.courseName)}>{course.courseName}</h3>
-              {showDelete === course.id && (
-                <button className="button delete" onClick={() => handleDeleteCourse(course.id)}>
-                  Delete Course
-                </button>
-              )}
-              {expandedCourse === course.courseName && (
-                <>
-                  <button onClick={() => generateQrCode(course.courseName)} className="button">Generate QR Code</button>
-                  {qrCodes[course.courseName] && (
-                    <div onClick={() => handleQrClick(course.courseName)} style={{ cursor: 'pointer' }}>
-                      <QRCodeCanvas value={qrCodes[course.courseName]} />
-                    </div>
-                  )}
+        {expandedCourse && (
+          <div className="course-details" style={{ marginTop: '20px' }}>
+            <div className="attendance-sheet" style={{ marginRight: '20px' }}>
+              {courses.filter(course => course.courseName === expandedCourse).map(course => (
+                <div key={course.id}>
                   {getClassGroupTables(course)}
-                </>
+                </div>
+              ))}
+            </div>
+            <div className="qr-code-section" style={{ display: 'inline-block', verticalAlign: 'top' }}>
+              <button onClick={() => generateQrCode(expandedCourse)} className="button">Generate QR Code</button>
+              {qrCodes[expandedCourse] && (
+                <div onClick={() => handleQrClick(expandedCourse)} style={{ cursor: 'pointer' }}>
+                  <QRCodeCanvas value={qrCodes[expandedCourse]} size={256} />
+                </div>
               )}
             </div>
-          ))}
-        </div>
+          </div>
+        )}
       </div>
       <div className="navigation-buttons">
         <button onClick={() => navigate('/')} className="nav-button">Back</button>

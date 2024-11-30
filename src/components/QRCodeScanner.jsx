@@ -1,56 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserQRCodeReader } from '@zxing/library';
+import React, { useRef, useEffect } from 'react';
+import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library';
 
-function QRCodeScanner({ onScan }) {
-  const [selectedDeviceId, setSelectedDeviceId] = useState('');
-  const [devices, setDevices] = useState([]);
-  const [scanner, setScanner] = useState(null);
-
-  useEffect(() => {
-    const codeReader = new BrowserQRCodeReader();
-    setScanner(codeReader);
-
-    codeReader.getVideoInputDevices()
-      .then(videoInputDevices => {
-        setDevices(videoInputDevices);
-        if (videoInputDevices.length > 0) {
-          setSelectedDeviceId(videoInputDevices[0].deviceId);
-        }
-      })
-      .catch(err => console.error(err));
-  }, []);
+const QRCodeScanner = ({ onScan, onError }) => {
+  const videoRef = useRef(null);
+  const isUnmountedRef = useRef(false);
 
   useEffect(() => {
-    if (selectedDeviceId && scanner) {
-      const previewElem = document.getElementById('video-preview');
-      scanner.decodeFromVideoDevice(selectedDeviceId, previewElem, (result, err) => {
-        if (result) {
-          onScan(result.text);
-        }
-        if (err) {
-          console.error(err);
-        }
-      });
+    const codeReader = new BrowserMultiFormatReader();
+    const videoElement = videoRef.current;
 
-      return () => {
-        scanner.reset();
-      };
-    }
-  }, [selectedDeviceId, scanner, onScan]);
+    const startScanning = async () => {
+      try {
+        console.log('Requesting video stream...');
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        if (videoElement) {
+          videoElement.srcObject = stream;
+          await videoElement.play();
+          console.log('Video stream started.');
+        }
+        if (!isUnmountedRef.current) {
+          codeReader.decodeFromVideoDevice(undefined, videoElement, (result, error) => {
+            if (result) {
+              console.log('QR code detected:', result.getText());
+              onScan(result.getText());
+            }
+            if (error && !(error instanceof NotFoundException)) {
+              console.error('Decode error:', error);
+              onError(error);
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Error accessing video stream:', error);
+        onError(error);
+      }
+    };
+
+    startScanning();
+
+    return () => {
+      isUnmountedRef.current = true;
+      codeReader.reset();
+      if (videoElement && videoElement.srcObject) {
+        const tracks = videoElement.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+      }
+    };
+  }, [onScan, onError]);
 
   return (
     <div>
-      <h3>Scan QR Code</h3>
-      {devices.length > 1 && (
-        <select onChange={(e) => setSelectedDeviceId(e.target.value)} value={selectedDeviceId}>
-          {devices.map((device, idx) => (
-            <option key={idx} value={device.deviceId}>{device.label || `Device ${idx + 1}`}</option>
-          ))}
-        </select>
-      )}
-      <video id="video-preview" width="100%" height="240" />
+      <video ref={videoRef} style={{ width: '100%' }} />
     </div>
   );
-}
+};
 
 export default QRCodeScanner;

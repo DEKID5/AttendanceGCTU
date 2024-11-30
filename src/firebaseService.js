@@ -75,9 +75,19 @@ export const authenticateUser = async (collectionName, id, password) => {
 
 export const updateAttendance = async (courseID, studentID) => {
   const courseRef = doc(db, 'courses', courseID);
-  await updateDoc(courseRef, {
-    [`attendance.${studentID}`]: true
-  });
+  const courseDoc = await courseRef.get();
+
+  if (courseDoc.exists) {
+    const courseData = courseDoc.data();
+    const updatedStudents = courseData.students.map(student => {
+      if (student.studentID === studentID) {
+        return { ...student, attendance: true }; // Mark attendance as true
+      }
+      return student;
+    });
+
+    await updateDoc(courseRef, { students: updatedStudents });
+  }
 };
 
 export const deleteCourseFromDB = async (courseID) => {
