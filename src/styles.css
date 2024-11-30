@@ -1,0 +1,34 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: white; /* Changed background color to white */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.homepage h1 {
+  font-size: 2.5em;
+  color: #000000; /* Set text color to black */
+}
+
+.buttons, .create-options {
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  font-size: 1em;
+  color: white;
+  background-color: #ED9E59;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #e18e4f;
+}
