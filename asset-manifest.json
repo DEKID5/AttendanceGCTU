@@ -1,13 +1,14 @@
 {
   "files": {
-    "main.css": "/AttendanceGCTU/static/css/main.ef1a2dba.css",
-    "main.js": "/AttendanceGCTU/static/js/main.4bad3b5e.js",
+    "main.css": "/AttendanceGCTU/static/css/main.550412a0.css",
+    "main.js": "/AttendanceGCTU/static/js/main.82c47901.js",
+    "static/media/top-banner.png": "/AttendanceGCTU/static/media/top-banner.0fe4e75c6a228166f843.png",
     "index.html": "/AttendanceGCTU/index.html",
-    "main.ef1a2dba.css.map": "/AttendanceGCTU/static/css/main.ef1a2dba.css.map",
-    "main.4bad3b5e.js.map": "/AttendanceGCTU/static/js/main.4bad3b5e.js.map"
+    "main.550412a0.css.map": "/AttendanceGCTU/static/css/main.550412a0.css.map",
+    "main.82c47901.js.map": "/AttendanceGCTU/static/js/main.82c47901.js.map"
   },
   "entrypoints": [
-    "static/css/main.ef1a2dba.css",
-    "static/js/main.4bad3b5e.js"
+    "static/css/main.550412a0.css",
+    "static/js/main.82c47901.js"
   ]
 }
